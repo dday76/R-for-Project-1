@@ -43,7 +43,7 @@ plot(output$interval,output$meanSteps,type="l",main="Time Series plot of Mean St
 
 ```
 
-### step : Missing Data Reporting and Imputating the missing values
+### step 4 : Missing values Reporting and Imputing 
 
 ```{r,echo=TRUE}
 compcases=complete.cases(rawdat)   # subset the complete case 
