@@ -1,0 +1,72 @@
+---
+title: "Course Project 1"
+author: "Henok"
+date: "December 20, 2016"
+output: html_document
+
+---
+
+#Reproducible Research (An online Coursera course)
+##Course Project 1 
+
+### Step 1 :  Loading and preprocessing the data set 
+ Step one includes reading the original data set and  preprocessing the data as needed for further analysis. 
+ 
+```{r, echo=TRUE}
+rm(list=ls())                                                                #clear the global envirnoment 
+setwd("F:/CourseraCourses/CourseReproducibleResearch/DataRcode4Project")     # setting the working directory 
+rawdat=read.csv("activity.csv")                                              # importing the original data set  17568 x3  data set 
+
+```
+
+### step 2 : Calculating the mean number of steps and produce histogram plot 
+In this step, them mean number of steps will be calculated. No imputation for the missing data will be made at this stage, rather missing data will be ingored when calculating the mean. Historgram will then be produced.
+
+```{r, echo=T}
+meanstep1=mean(rawdat$steps,na.rm=T)
+meanstep1
+hist(rawdat$steps,main="Histogrm for the total number\n steps taken per day",xlab="Total Number of Steps Per Day")
+Medianstep1=median(rawdat$steps,na.rm = T)
+Medianstep1
+```
+
+The mean number of steps taken per day was `r meanstep1` and the median number of steps taken per day was `r Medianstep1`.
+
+### step 3 : Producing a Time Series Plot 
+
+```{r, echo=T}
+
+output=aggregate(rawdat$steps~as.factor(rawdat$interval),FUN=mean,data = rawdat)
+colnames(output)=c("interval","meanSteps")
+plot(output$interval,output$meanSteps,type="l",main="Time Series plot of Mean Steps per day\n over a five minute difference",
+     xlab="5-minutes interval",ylab="Mean number of steps")
+
+```
+
+### step : Missing Data Reporting and Imputating the missing values
+
+```{r,echo=TRUE}
+compcases=complete.cases(rawdat)   # subset the complete case 
+missingdat=rawdat[!compcases,]    # subset the observation with missing data set 
+
+# this is to be used for imputing the missing value in the number of steps using them mean of the steps for each 5 minute interval
+inter=levels(as.factor(rawdat$interval))    
+ninter=length(inter)
+Intervalmean=numeric(ninter)
+   for (i in 1:ninter)
+       Intervalmean[i]=mean(rawdat[rawdat[,3]==inter[i],1],na.rm=T)
+
+for (i in 1:dim(rawdat)[1])
+    if (is.na(rawdat[i,1]))
+         rawdat[i,1]=Intervalmean[which(inter==rawdat[i,3])]
+
+# Histogram after making imputation 
+hist(rawdat$steps)              #histogram
+meanstep=mean(rawdat$steps)     # new mean after imputation
+meanstep
+Medianstep=median(rawdat$steps)  # new median after after imputation
+Medianstep
+
+```
+
+The result of the mean and median did not change after imputing the missing value .
