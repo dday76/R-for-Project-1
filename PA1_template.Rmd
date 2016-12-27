@@ -22,7 +22,7 @@ rawdat=read.csv("activity.csv")                                              # i
 ### step 2 : Calculating the mean number of steps and produce histogram plot 
 In this step, them mean number of steps will be calculated. No imputation for the missing data will be made at this stage, rather missing data will be ingored when calculating the mean. Historgram will then be produced.
 
-```{r, echo=T}
+```{r, echo=TRUE}
 meanstep1=mean(rawdat$steps,na.rm=T)
 meanstep1
 hist(rawdat$steps,main="Histogrm for the total number\n steps taken per day",xlab="Total Number of Steps Per Day")
@@ -34,7 +34,7 @@ The mean number of steps taken per day was `r meanstep1` and the median number o
 
 ### step 3 : Producing a Time Series Plot 
 
-```{r, echo=T}
+```{r, echo=TRUE}
 
 output=aggregate(rawdat$steps~as.factor(rawdat$interval),FUN=mean,data = rawdat)
 colnames(output)=c("interval","meanSteps")
@@ -70,3 +70,27 @@ Medianstep
 ```
 
 The result of the mean and median did not change after imputing the missing value .
+
+###step 5 : Categorzing the given date as weekend and weekday
+
+```{r,echo=TRUE}
+library(chron)                                  #package used to chage a given date to weekend or weekday
+rawdat$day=chron::is.weekend((rawdat$date))     # a given date will be False if not weekend else True
+rawdat$day=ifelse(rawdat$day=="FALSE","Weekday","Weekend")
+weekdays=subset(rawdat,day=="Weekday")    #subset the data for weekdays only 
+weekends=subset(rawdat,day=="Weekend")    #subset the data for weekends only
+
+#plot of mean steps taken averaged accross weekdays and weekends separately 
+par(mfrow=c(1,2))
+meanweekdays=aggregate(weekdays$steps~as.factor(weekdays$interval),FUN=mean,data = weekdays)
+colnames(meanweekdays)=c("interval","meanStepsWeekend")
+meanweekends=aggregate(weekends$steps~as.factor(weekends$interval),FUN=mean,data =weekends)
+colnames(meanweekends)=c("interval","meanStepsWeekend")
+plot(meanweekdays$interval,meanweekdays$meanStepsWeekend,type="l",col="red",main="Weekdays",
+     xlab="5-minutes interval",ylab="Mean number of steps")
+plot(meanweekends$interval,meanweekends$meanStepsWeekend,type="l",col="red",main="Weekends",
+     xlab="5-minutes interval",ylab="Mean number of steps")
+
+
+```
+
